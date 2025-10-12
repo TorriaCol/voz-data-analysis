@@ -3,6 +3,11 @@ import pandas as pd
 import requests
 from datetime import datetime, timedelta
 
+import deployment_sets as sets
+import my_setup as my
+
+output_folder_path = my.outputpath()
+
 def fetch_github_csv_files(repo_url, folder_path, target_filename=None, branch="main"):
     """
     Fetch CSV file download URLs from a GitHub repo using the tree API (works for large folders).
@@ -65,12 +70,12 @@ def combine_csv_files(csv_files, input_folder, output_file):
     except Exception as e:
         print(f"Error during data combination: {e}")
 
-def segregate_by_device_id(combined_file, output_folder, device_names=None):
+def segregate_by_device_id(combined_file, output_folder, devices=None):
     try:
         combined_data = pd.read_csv(combined_file)
         for device_id, data in combined_data.groupby("coreid"):
-            if device_names and device_id in device_names:
-                device_name = device_names[device_id]
+            if devices and device_id in devices:
+                device_name = devices[device_id]
             else:
                 device_name = f"device_{device_id}"
             output_file = os.path.join(output_folder, f"{device_name}.csv")
@@ -79,21 +84,20 @@ def segregate_by_device_id(combined_file, output_folder, device_names=None):
     except Exception as e:
         print(f"Error during data segregation: {e}")
 
-    if __name__ == "__main__":
-        github_repo_url = "QuinnResearch/carbVoz_data" 
+if __name__ == "__main__":
+    github_repo_url = "QuinnResearch/carbVoz_data" 
 
 ### Uncomment for use with moospmV3_daily folder
-#     folder_path = "moospmV3_daily"  
+#    folder_path = "moospmV3_daily"  
 
 ### Uncomment for use with moospmV3_cal 
     folder_path = "moospmV3_cal"  
 
-    output_folder_path = "./"  # Change to your desired file path
     output_combined_csv = "combined_data.csv" 
 
 # Define start and end dates
     start_date = datetime.strptime("2025-07-10", "%Y-%m-%d")
-    end_date = datetime.strptime("2025-09-16", "%Y-%m-%d")
+    end_date = datetime.strptime("2025-07-11", "%Y-%m-%d")
 
 ### Uncomment for use with moospmV3_daily
     # target_filename = [
@@ -109,7 +113,7 @@ def segregate_by_device_id(combined_file, output_folder, device_names=None):
     ]
 
 # Fetch CSV files from GitHub and download them
-    csv_files = fetch_github_csv_files(github_repo_url, folder_path, target_filename=target_filename)
+    csv_files = fetch_github_csv_files(github_repo_url, folder_path, target_filename)
     for file_url in csv_files:
         download_and_save_csv(file_url, output_folder_path)
 
@@ -117,33 +121,10 @@ def segregate_by_device_id(combined_file, output_folder, device_names=None):
     output_combined_file = os.path.join(output_folder_path, output_combined_csv)
     combine_csv_files(csv_files, output_folder_path, output_combined_file)
 
-
 ### 2023 DEPLOYMENT DEVICES
-    # device_names = {
-    # "e00fce6856818e5885f65487" :"VOZ_Box_Fresno",
-    # "e00fce68f12da1a0c5de6248" :"VOZ_Box_Coalinga",
-    # "e00fce6808784ceaf209f949" :"VOZ_Box_TerraBella",
-    # "e00fce68e739ecbcf9e91965" :"VOZ_Box_CutlerOrosi",
-    # "e00fce6850cac69f647dc199" :"VOZ_Box_Avenal",
-    # "e00fce68e28dcbc9a589be10" :"VOZ_Box_CantuaCreek",
-    # "e00fce6876826e255108c6bd" :"VOZ_Box_Lanare",
-    # "e00fce68e88237db75a60608" :"VOZ_Box_LostHills",
-    # "e00fce6858b443fd80f27170" :"VOZ_Box_KettlemanCity",
-    # "e00fce682bbf742cd0b6768a" :"VOZ_Box_Taft",
-    # "e00fce6835b6173deb1a1f49" :"VOZ_Box_Tranquility"
-    # }
+    # devices = sets.files_2023()
 
 ### 2025 DEPLOYMENT DEVICES
-    device_names = {
-        "e00fce68e28dcbc9a589be10" :"VOZ_Box_CutlerOrosi",
-        "e00fce68e88237db75a60608" :"VOZ_Box_1A_8",
-        "e00fce6858b443fd80f27170" :"VOZ_Box_TerraBella",
-        "e00fce682bbf742cd0b6768a" :"VOZ_Box_LostHills",
-        "e00fce686dc2ef0a68fa40b0" :"VOZ_Box_McFarland",
-        "e00fce68d6b773b56ce8baa0" :"VOZ_Box_Coalinga"
-    }
-        
-
-    # Segregate data by device id and use device_names dictionary for custom filenames
-    segregate_by_device_id(output_combined_file, output_folder_path, device_names)
+    devices = sets.devices_2025()
+    segregate_by_device_id(output_combined_file, output_folder_path, devices)
 
