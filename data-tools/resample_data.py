@@ -21,7 +21,11 @@ for input_file in input_files:
     df.set_index('date_time', inplace=True)
 
     # Resample the dataset to 10-minute averages
-    resampled_df = df.resample('10T').mean(numeric_only=True)
+    resampled_df = (
+    df.resample('1H', label='right', closed='right')  # resample to 1-hour bins
+      .mean(numeric_only=True)
+      .shift(freq='-30min')  # move timestamps 30 minutes earlier
+    )
     resampled_df.dropna(how='all', inplace=True)
 
     # Reset the index to include the 'date_time' column in the output
