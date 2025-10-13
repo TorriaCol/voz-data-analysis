@@ -96,8 +96,8 @@ if __name__ == "__main__":
     output_combined_csv = "combined_data.csv" 
 
 # Define start and end dates
-    start_date = datetime.strptime("2025-07-10", "%Y-%m-%d")
-    end_date = datetime.strptime("2025-07-11", "%Y-%m-%d")
+    start_date = datetime.strptime("2025-07-19", "%Y-%m-%d")
+    end_date = datetime.strptime("2025-07-20", "%Y-%m-%d")
 
 ### Uncomment for use with moospmV3_daily
     # target_filename = [
