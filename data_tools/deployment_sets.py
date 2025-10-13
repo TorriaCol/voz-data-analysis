@@ -27,33 +27,33 @@ def devices_2025():
 
 def files_2023():
     files = [
-        "VOZ_Box_Fresno.csv",
-        "VOZ_Box_Coalinga.csv",
-        "VOZ_Box_TerraBella.csv",
-        "VOZ_Box_CutlerOrosi.csv",
-        "VOZ_Box_Avenal.csv",
-        "VOZ_Box_CantuaCreek.csv",
-        # "VOZ_Box_Lanare.csv",
-        "VOZ_Box_LostHills.csv",
-        "VOZ_Box_KettlemanCity.csv",
-        "VOZ_Box_Taft.csv",
-        "VOZ_Box_Tranquility.csv"
+        "VOZ_Box_Fresno",
+        "VOZ_Box_Coalinga",
+        "VOZ_Box_TerraBella",
+        "VOZ_Box_CutlerOrosi",
+        "VOZ_Box_Avenal",
+        "VOZ_Box_CantuaCreek",
+        # "VOZ_Box_Lanare",
+        "VOZ_Box_LostHills",
+        "VOZ_Box_KettlemanCity",
+        "VOZ_Box_Taft",
+        "VOZ_Box_Tranquility"
     ]
     return files
 
 def files_2025():
     files = [
-        "VOZ_Box_CutlerOrosi.csv",
-        "VOZ_Box_1A_8.csv",
-        "VOZ_Box_TerraBella.csv",
-        "VOZ_Box_LostHills.csv",
-        "VOZ_Box_McFarland.csv",
-        "VOZ_Box_Coalinga.csv"
+        "VOZ_Box_CutlerOrosi",
+        "VOZ_Box_1A_8",
+        "VOZ_Box_TerraBella",
+        "VOZ_Box_LostHills",
+        "VOZ_Box_McFarland",
+        "VOZ_Box_Coalinga"
     ]
     return files
 
 def CARB_pm25_IDs():
-    ref_IDs = {
+    IDs = {
         "Clovis": 3026,
         "Fresno-Foundry Park": 3826,
         "Fresno-Garland": 3781,
@@ -65,5 +65,5 @@ def CARB_pm25_IDs():
         "Porterville": 3763,
         "Visalia": 3863
     }
-    return ref_IDs
+    return IDs
 
