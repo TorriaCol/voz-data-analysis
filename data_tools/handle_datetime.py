@@ -23,3 +23,4 @@ def utc_to_CA(data):
     data.index = data.index.tz_convert('US/Pacific')
     data.index = data.index.tz_localize(None)
     return data
+    
