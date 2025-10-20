@@ -4,13 +4,14 @@ import pandas as pd
 import deployment_sets as sets
 import my_setup as my
 
-input_folder_path = my.outputpath()
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+input_folder_path = my.deployment_2023_path()
 
 ### 2023 DEPLOYMENT DEVICES
-# input_files = sets.files_2023()
+input_files = sets.files_2023()
 
 ### 2025 DEPLOYMENT DEVICES
-input_files = sets.files_2025()
+# input_files = sets.files_2025()
 
 for input_file in input_files:
     # Construct the full path to the CSV file
@@ -31,8 +32,7 @@ for input_file in input_files:
     # Reset the index to include the 'date_time' column in the output
     resampled_df.reset_index(inplace=True)
 
-    output_file = input_file.replace('.csv', '_mod.csv')
     # Download data to same place
-    output_path = os.path.join(input_folder_path, output_file)
+    output_path = os.path.join(input_folder_path, input_file)
     resampled_df.to_csv(output_path, index=False)
     print(f"Resampled dataset saved to '{output_path}'")
