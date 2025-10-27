@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     # Define start/end dates
     start_date = datetime.strptime("2023-06-07", "%Y-%m-%d")
-    end_date = datetime.strptime("2023-12-31", "%Y-%m-%d")
+    end_date = datetime.strptime("2023-06-07", "%Y-%m-%d")
 
 # ### Uncomment for use with moospmV3_daily
     target_filename = [

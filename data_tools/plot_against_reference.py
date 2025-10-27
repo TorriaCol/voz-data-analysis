@@ -19,6 +19,7 @@ class PlotPlantower:
         fig.text(0.5, 0.92, "Unit-Specific Models", ha='center', fontsize=14, fontweight='bold')
         fig.subplots_adjust(hspace=0.3)  # increase vertical space between rows
         fig.text(0.5,0.48,"Universal Models", ha='center', fontsize=14, fontweight='bold' )
+        plt.savefig(rf"./images/Plantower{sensor_id}CalibrationStatswEPA.jpg", format='jpg', dpi=300)
 
         self.add_to_plots(0,0,'PM_calibrated_ClarityRemake', 'Clarity v2 Variables - PM10', axs, data)
         self.add_to_plots(0,1,'PM_calibrated_Basic', 'RH + PM2.5', axs, data)
@@ -27,6 +28,7 @@ class PlotPlantower:
 
         fig, ax = plt.subplots(figsize=(7,6))
         self.add_to_plots(0,0,'m_PM25_CF1', 'Raw Plantower CF1', ax, data)  # pass ax instead of axs grid
+        plt.savefig(rf"./images/Plantower{sensor_id}RawStats.jpg", format='jpg', dpi=300)
 
     def add_to_plots(self, i, j, model, name, axs, data):
     # If axs is a 2D array (grid)
@@ -57,7 +59,7 @@ class PlotPlantower:
         ax.plot(x, y_fit, c = 'red', label = 'Best fit')
 
         # Metrics
-        r2, rmse, mbe, nmb, nme = calculate_metrics(data['reference'], data[model])
+        r2, rmse, mbe, nmb, nme = self.calculate_metrics(data['reference'], data[model])
         ax.text(0.1, 0.95, f'R\u00b2 = {r2:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
         ax.text(0.1, 0.87, f'RMSE = {rmse:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
         ax.text(0.1, 0.80, f'MBE = {mbe:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
@@ -98,16 +100,19 @@ def calculate_metrics(self, observed, predicted):
 
 class PlotSensirion:
     def __init__(self):
-        pass
+        self.vmin = 0
+        self.vmax = 60
+        self.temp_norm = Normalize(vmin=self.vmin, vmax=self.vmax)
 
     def plot(self, data, sensor_id):
         # Set up 1x3 grid of subplots
-        fig, axs = plt.subplots(1, 3, figsize=(15,6))
+        fig, axs = plt.subplots(1, 3, figsize=(18,6))
         fig.suptitle(f"{sensor_id} Calibration Model Comparison\n", fontsize=16)
         fig.subplots_adjust(hspace=0.3)  # increase vertical space between rows
         self.add_to_plots(2,'PM_calibrated_ClarityRemake', 'Clarity v2 Variables - PM10', axs, data)
         self.add_to_plots(1,'PM_calibrated_Basic', 'RH + PM2.5', axs, data)
         self.add_to_plots(0,'m_PM25_b', 'Raw Data', axs, data)
+        plt.savefig(rf"./images/Sensirion{sensor_id}CalibrationStats.jpg", format='jpg', dpi=300)
 
     def add_to_plots(self, i, model, name, axs, data):
     # If axs is a 2D array (grid)
@@ -138,7 +143,7 @@ class PlotSensirion:
         ax.plot(x, y_fit, c = 'red', label = 'Best fit')
 
         # Metrics
-        r2, rmse, mbe, nmb, nme = calculate_metrics(data['reference'], data[model])
+        r2, rmse, mbe, nmb, nme = self.calculate_metrics(data['reference'], data[model])
         ax.text(0.1, 0.95, f'R\u00b2 = {r2:.2f}', transform=ax.transAxes, fontsize=11, verticalalignment='top')
         ax.text(0.1, 0.87, f'RMSE = {rmse:.2f}', transform=ax.transAxes, fontsize=11, verticalalignment='top')
         ax.text(0.1, 0.80, f'MBE = {mbe:.2f}', transform=ax.transAxes, fontsize=11, verticalalignment='top')
@@ -164,7 +169,7 @@ class PlotSensirion:
         ax.set_ylim(0, 80)
 
     # Function to calculate metrics
-    def calculate_metrics(observed, predicted):
+    def calculate_metrics(self, observed, predicted):
         r2 = r2_score(observed, predicted)
         rmse = root_mean_squared_error(observed, predicted)
         mbe = (predicted - observed).mean()
