@@ -21,6 +21,7 @@ def utc_to_CA(data):
     data.index = pd.to_datetime(data.index, utc=True)
     data.index = data.index.tz_convert('US/Pacific')
     data.index = data.index.tz_localize(None)
+    data = data[~data.index.duplicated(keep='first')]
     return data
 
 def create_standard_datetime(data):
