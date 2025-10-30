@@ -20,9 +20,9 @@ class ClarityCalibrator:
         return data
 
     def get_parameters(self):
-        low_df = pd.read_excel(r"../reference_files/2023rawdata/calibration_variables/ClarityLowValVars.xlsx")
+        low_df = pd.read_excel(r"../reference_files/2023rawdata/Plantower_calibration_variables/ClarityLowValVars.xlsx")
         low_params = low_df.iloc[0].tolist()
-        high_df = pd.read_excel(r"../reference_files/2023rawdata/calibration_variables/ClarityHighValVars.xlsx")
+        high_df = pd.read_excel(r"../reference_files/2023rawdata/Plantower_calibration_variables/ClarityHighValVars.xlsx")
         high_params = high_df.iloc[0].tolist()
         return low_params, high_params
 
@@ -58,5 +58,5 @@ class ClarityCalibrator:
 
     def calibrate(self, data):
         data['omega'] = (100 - data["m_PM25_CF1"]) / 200
-        data['PM_calibrated_Clarity'] = data.apply(self.calibration, axis=1)
+        data['pm_calibrated_clarity'] = data.apply(self.calibration, axis=1)
         return data

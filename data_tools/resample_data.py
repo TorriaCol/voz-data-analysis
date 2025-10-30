@@ -5,7 +5,7 @@ import deployment_sets as sets
 import my_setup as my
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-input_folder_path = my.deployment_2023_path()
+input_folder_path = my.raw_2023data_path()
 
 ### 2023 DEPLOYMENT DEVICES
 input_files = sets.files_2023()

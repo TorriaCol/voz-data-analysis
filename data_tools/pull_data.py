@@ -7,7 +7,7 @@ import deployment_sets as sets
 import my_setup as my
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-output_folder_path = my.deployment_2023_path()
+output_folder_path = my.raw_2023data_path()
 
 def fetch_github_csv_files(repo_url, folder_path, target_filename=None, branch="main"):
     base_api_url = "https://api.github.com/repos"
