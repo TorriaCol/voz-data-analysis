@@ -22,9 +22,9 @@ class CreateTrainingandTestData:
 
     def get_combined_data(self,training_date,testing_date,calibration_reference,deployment_reference):
         training = self._get_training_data(training_date,calibration_reference,deployment_reference)
-        testing = self._get_testing_data(testing_date,deployment_reference,self.voz_data)
-        all = self._get_all_data(testing,training)
-        return training,all
+        testing = self._get_testing_data(testing_date, deployment_reference)
+        all_data = self._with_reference(training,testing)
+        return training, all_data
 
     def _get_training_data(self,training_date, calibration_reference, deployment_reference):
         precal_voz_data = self.voz_data[(self.voz_data.index >= training_date[0]) & (self.voz_data.index <= training_date[1])]
@@ -45,22 +45,31 @@ class CreateTrainingandTestData:
         # all_training_data['month'] = all_training_data.index.month
         # all_training_data['week'] = all_training_data.index.isocalendar().week
         
-        all_training_data = clean_data.clean(all_training_data,self.variable)
+        all_training_data = clean_data.eliminate_outliers(all_training_data,self.variable)
 
         return all_training_data
 
-    def _get_testing_data(self,testing_date,deployment_reference,voz_data):
-        voz_test1 = voz_data[(voz_data.index >= testing_date[0]) & (voz_data.index <= testing_date[1])] #Trial 1 Period
-        voz_test2 = voz_data[(voz_data.index >= testing_date[2]) & (voz_data.index <= testing_date[3])] #Trial 2 Period
+    def _get_testing_data(self,testing_date,deployment_reference):
+        voz_test1 = self.voz_data[(self.voz_data.index >= testing_date[0]) & (self.voz_data.index <= testing_date[1])] #Trial 1 Period
+        voz_test2 = self.voz_data[(self.voz_data.index >= testing_date[2]) & (self.voz_data.index <= testing_date[3])] #Trial 2 Period
         voz_testing_data = pd.concat([voz_test1, voz_test2])
         
         all_testing_data = voz_testing_data.join(deployment_reference, how='inner')
-        # all_testing_data = clean_data.clean(all_testing_data,self.variable)
 
         return all_testing_data
 
-    def _get_all_data(self,all_testing_data,all_training_data):
-        all_data = pd.concat([all_testing_data,all_training_data]).sort_index()
+    def _with_reference(self,all_testing_data,all_training_data):
+        combined = pd.concat([all_testing_data, all_training_data])
+        
+        # Align reference data columns with combined (fill missing column with NaN)
+        voz_data = self.voz_data.reindex(columns=combined.columns)
+        
+        # Keep only rows from reference that have new datetimes
+        new_rows = voz_data.loc[~voz_data.index.isin(combined.index)]
+        
+        # Concatenate everything and sort by datetime index
+        all_data = pd.concat([combined, new_rows]).sort_index()
+        
         return all_data
     
     # Cuts data into subsections as specified by dates. 

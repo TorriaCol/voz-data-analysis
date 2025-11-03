@@ -17,9 +17,9 @@ def calibrate(training_data, variables, output_path):
 
     # Define piecewise ranges
     ranges = [
-        # (lambda x: x <= 10, "10 and under"),
+        (lambda x: x <= 10, "10 and under"),
         # (lambda x: (x > 3) & (x <= 10), "5 - 15"),
-        (lambda x: x >=0, "10+")
+        (lambda x: x > 10, "10+")
     ]
 
     labels = ["range"] + variables + ["intercept"]
@@ -65,21 +65,21 @@ def run_calibration(subset_data, variables, range_label):
     return model
 
 
-def apply_calibration(models, test_data, variables, new_column):
+def apply_calibration(models, all_data, variables, new_column):
     """
     Apply piecewise calibration models to a separate dataset.
     - models: dict of trained models per range
-    - test_data: DataFrame to apply calibration to
+    - all_data: DataFrame to apply calibration to
     - variables: list of predictor column names
     - new_column: name for calibrated output column
     """
-    test_data[new_column] = np.nan
+    all_data[new_column] = np.nan
 
     # Define same piecewise ranges
     ranges = [
-        # (lambda x: x <= 10, "10 and under"),
+        (lambda x: x <= 10, "10 and under"),
         # (lambda x: (x > 3) & (x <= 10), "5 - 15"),
-        (lambda x: x >= 0, "10+")
+        (lambda x: x > 10, "10+")
     ]
 
     for condition_func, range_label in ranges:
@@ -87,8 +87,8 @@ def apply_calibration(models, test_data, variables, new_column):
             print(f"No trained model for range '{range_label}', skipping...")
             continue
 
-        subset_mask = condition_func(test_data[variables[0]])
-        subset_data = test_data.loc[subset_mask]
+        subset_mask = condition_func(all_data[variables[0]])
+        subset_data = all_data.loc[subset_mask]
 
         if subset_data.empty:
             print(f"No data in test set for range '{range_label}', skipping...")
@@ -96,7 +96,7 @@ def apply_calibration(models, test_data, variables, new_column):
 
         model = models[range_label]
         predictions = model.predict(subset_data[variables])
-        test_data.loc[subset_data.index, new_column] = predictions
+        all_data.loc[subset_data.index, new_column] = predictions
 
     print(f"Applied calibration models; results stored in '{new_column}'")
-    return test_data
+    return all_data
