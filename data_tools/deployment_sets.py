@@ -43,12 +43,12 @@ def files_2023():
 
 def files_2025():
     files = [
-        "CutlerOrosi",
-        "1A_8",
-        "TerraBella",
-        "LostHills",
-        "McFarland",
-        "Coalinga"
+        "CutlerOrosi.csv",
+        "1A_8.csv",
+        "TerraBella.csv",
+        "LostHills.csv",
+        "McFarland.csv",
+        "Coalinga.csv"
     ]
     return files
 
