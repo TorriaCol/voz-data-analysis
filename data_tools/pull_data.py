@@ -7,7 +7,11 @@ import deployment_sets as sets
 import my_setup as my
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-output_folder_path = my.raw_2023data_path()
+### Uncomment for use with 2025 data
+output_folder_path = my.raw_2025data_path()
+
+# ### Uncomment for use with 2023 data
+# output_folder_path = my.raw_2023data_path()
 
 def fetch_github_csv_files(repo_url, folder_path, target_filename=None, branch="main"):
     base_api_url = "https://api.github.com/repos"
@@ -71,28 +75,28 @@ if __name__ == "__main__":
     github_repo_url = "QuinnResearch/carbVoz_data"
     output_combined_csv = "combined_data.csv"
 
-    # ### Uncomment for use with moospmV3_daily folder
-    folder_path = "moospmV3_daily"  
+    # # ### Uncomment for use with moospmV3_daily folder
+    # folder_path = "moospmV3_daily"  
 
-# ### Uncomment for use with moospmV3_cal 
-#     # folder_path = "moospmV3_cal"  
+## Uncomment for use with moospmV3_cal 
+    folder_path = "moospmV3_cal"  
 
     # Define start/end dates
-    start_date = datetime.strptime("2023-06-07", "%Y-%m-%d")
-    end_date = datetime.strptime("2023-06-07", "%Y-%m-%d")
+    start_date = datetime.strptime("2025-06-19", "%Y-%m-%d")
+    end_date = datetime.strptime("2025-11-05", "%Y-%m-%d")
 
 # ### Uncomment for use with moospmV3_daily
-    target_filename = [
-        f"moospmV3_{(start_date + timedelta(days=i)).strftime('%Y-%m-%d')}.csv"
-        for i in range((end_date - start_date).days + 1)
-    ]
+#     target_filename = [
+#         f"moospmV3_{(start_date + timedelta(days=i)).strftime('%Y-%m-%d')}.csv"
+#         for i in range((end_date - start_date).days + 1)
+#     ]
 
-# ### Uncomment for use with moospmV3_cal
-#     # target_filename = [
-#     # f"moospmV3_cal_{(start_date + timedelta(days=i)).strftime('%Y-%m-%d')}T{hour:02d}.csv"
-#     # for i in range((end_date - start_date).days + 1)
-#     # for hour in range(24)
-#     # ]
+## Uncomment for use with moospmV3_cal
+    target_filename = [
+    f"moospmV3_cal_{(start_date + timedelta(days=i)).strftime('%Y-%m-%d')}T{hour:02d}.csv"
+    for i in range((end_date - start_date).days + 1)
+    for hour in range(24)
+    ]
 
     # Pull list of URLs (but do NOT save them individually)
     csv_files = fetch_github_csv_files(github_repo_url, folder_path, target_filename)
@@ -102,10 +106,10 @@ if __name__ == "__main__":
     combine_csv_files_from_urls(csv_files, output_combined_file)
 
 # ### 2023 DEPLOYMENT DEVICES
-    devices = sets.devices_2023()
+    # devices = sets.devices_2023()
 
 # ### 2025 DEPLOYMENT DEVICES
-#     # devices = sets.devices_2025()
+    devices = sets.devices_2025()
 
     # Split into per-device files
     segregate_by_device_id(output_combined_file, output_folder_path, devices)

@@ -5,13 +5,18 @@ import deployment_sets as sets
 import my_setup as my
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-input_folder_path = my.raw_2023data_path()
 
-### 2023 DEPLOYMENT DEVICES
-input_files = sets.files_2023()
+### Uncomment for use with 2025 data
+input_folder_path = my.raw_2025data_path()
 
- ### 2025 DEPLOYMENT DEVICES
-# input_files = sets.files_2025()
+# ### Uncomment for use with 2023 data
+# input_folder_path = my.raw_2023data_path()
+
+# ### 2023 DEPLOYMENT DEVICES
+# input_files = sets.files_2023()
+
+ ## 2025 DEPLOYMENT DEVICES
+input_files = sets.files_2025()
 
 for input_file in input_files:
     # Construct the full path to the CSV file
