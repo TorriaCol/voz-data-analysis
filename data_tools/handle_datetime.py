@@ -4,7 +4,13 @@ import pandas as pd
 #   Data has been resampled to hourly
 #   date_time is in UTC
 def create_utc_for_voz(data):
-    data['date_time'] = pd.to_datetime(data['date_time'])
+    if 'unixtime' in data.columns:
+        data['date_time'] = pd.to_datetime(data['unixtime'], unit='s', utc=True)
+    elif 'date_time' in data.columns:
+        data['date_time'] = pd.to_datetime(data['date_time'])
+    else:
+        print("No time column found.")
+        return
     data.set_index('date_time',inplace=True)
     return data
 
