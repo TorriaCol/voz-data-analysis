@@ -68,7 +68,7 @@ def calibrated_files_2023():
     ]
     return files
 
-def CARB_pm25_IDs():
+def CARB_IDs():
     IDs = {
         "Clovis": 3026,
         "Fresno-Foundry Park": 3826,
@@ -79,7 +79,10 @@ def CARB_pm25_IDs():
         "Corcoran": 3194,
         "Hanford": 3129,
         "Porterville": 3763,
-        "Visalia": 3863
+        "Visalia": 3863,
+        "Fresno-Drummond": 2013,
+        "Parlier": 2114,
+        "Shafter": 2981
     }
     return IDs
 
