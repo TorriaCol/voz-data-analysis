@@ -1,8 +1,8 @@
 import pandas as pd
 
-def training(sensor_id):
+def training(sensor_id, year):
     # Read date_file
-    dates = read_date_file(sensor_id)
+    dates = read_date_file(sensor_id, year)
 
     # Assign training dates
     training_dates = [
@@ -14,9 +14,9 @@ def training(sensor_id):
 
     return training_dates
 
-def testing(sensor_id):
+def testing(sensor_id, year):
     # Read date_file
-    dates = read_date_file(sensor_id)
+    dates = read_date_file(sensor_id, year)
 
     # Assign testing dates
     testing_dates = [
@@ -28,8 +28,8 @@ def testing(sensor_id):
 
     return testing_dates
 
-def read_date_file(sensor_id):
-    date_file = rf"../reference_files/2023_deployment_dates.xlsx"
+def read_date_file(sensor_id, year):
+    date_file = rf"../reference_files/{year}_deployment_dates.xlsx"
     all_dates = pd.read_excel(date_file, sheet_name=1)
     dates = all_dates.loc[all_dates['sensor_id'] == sensor_id].squeeze()
     date_columns = [col for col in dates.index if col not in ['sensor_id', 'PreNumDays', 'PostNumDays', 'WithFEM']]

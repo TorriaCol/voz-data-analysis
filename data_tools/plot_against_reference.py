@@ -30,7 +30,7 @@ class PlotPlantower:
         self._add_to_plots(1,1,'pm_calibrated_epa_barkjohn', 'EPA Barkjohn 2021', axs, data)
         self._add_to_plots(1,0,'pm_calibrated_clarity', 'Clarity v2', axs, data)
         imagefolder = my_setup.local_image_folder("Plantower")
-        plt.savefig(rf"{imagefolder}{sensor_id}/{period}CalibrationStatswEPA.jpg", format='jpg', dpi=300)
+        plt.savefig(rf"{imagefolder}{sensor_id}/{period}CalibrationStatswEPAcompare.jpg", format='jpg', dpi=300)
 
         fig, ax = plt.subplots(figsize=(7,6))
         self._add_to_plots(0,0,'m_PM25_CF1', 'Raw Plantower CF1', ax, data)  # pass ax instead of axs grid

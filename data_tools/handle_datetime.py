@@ -4,10 +4,10 @@ import pandas as pd
 #   Data has been resampled to hourly
 #   date_time is in UTC
 def create_utc_for_voz(data):
-    if 'unixtime' in data.columns:
-        data['date_time'] = pd.to_datetime(data['unixtime'], unit='s', utc=True)
-    elif 'date_time' in data.columns:
+    if 'date_time' in data.columns:
         data['date_time'] = pd.to_datetime(data['date_time'])
+    elif 'unixtime' in data.columns:
+        data['date_time'] = pd.to_datetime(data['unixtime'], unit='s', utc=True)
     else:
         print("No time column found.")
         return
@@ -25,7 +25,7 @@ def create_utc_for_CARB(data):
 
 def utc_to_CA(data):
     data.index = pd.to_datetime(data.index, utc=True)
-    data.index = data.index.tz_convert('US/Pacific')
+    data.index = data.index.tz_convert('America/Los_Angeles')
     data.index = data.index.tz_localize(None)
     data = data[~data.index.duplicated(keep='first')]
     return data

@@ -20,26 +20,23 @@ class CreateTrainingandTestData:
         self.sensor_id = sensor_id
         self.voz_data = voz_data
 
-    def get_combined_data(self,training_date,testing_date,calibration_reference,deployment_reference):
-        training = self._get_training_data(training_date,calibration_reference,deployment_reference)
-        testing = self._get_testing_data(testing_date, deployment_reference)
+    def get_combined_data(self,training_date,testing_date,reference_1,reference_2):
+        training = self._get_training_data(training_date,reference_1,reference_2)
+        testing = self._get_testing_data(testing_date, reference_2)
         all_data = self._with_reference(training,testing)
         return training, all_data
 
-    def _get_training_data(self,training_date, calibration_reference, deployment_reference):
+    def _get_training_data(self,training_date, reference_1, reference_2):
+        # Merge the datasets for precalibration
         precal_voz_data = self.voz_data[(self.voz_data.index >= training_date[0]) & (self.voz_data.index <= training_date[1])]
-
-        # Merge the datasets for the first dataset
-        precal_all_data = precal_voz_data.join(calibration_reference, how='inner')
-        
+        precal_all_data = precal_voz_data.join(reference_1, how='inner')
+        # Merge the datasets for the postcalibration
         postcal_voz_data = self.voz_data[(self.voz_data.index >= training_date[2]) & (self.voz_data.index <= training_date[3])]
+        postcal_all_data = postcal_voz_data.join(reference_2, how='inner')
 
-        # Merge the datasets for the second dataset
-        if self.sensor_id == "Tranquility":
-            postcal_all_data = postcal_voz_data.join(deployment_reference, how='inner') # Use for Tranquility site
-        else:
-            postcal_all_data = postcal_voz_data.join(calibration_reference, how='inner') # Use for all sites except Tranquility
         all_training_data = pd.concat([precal_all_data, postcal_all_data])
+
+        print(all_training_data)
 
         # all_training_data['day_counter'] = (all_training_data.index - all_training_data.index[0]).days+1
         # all_training_data['month'] = all_training_data.index.month
@@ -49,12 +46,12 @@ class CreateTrainingandTestData:
 
         return all_training_data
 
-    def _get_testing_data(self,testing_date,deployment_reference):
+    def _get_testing_data(self,testing_date,reference_2):
         voz_test1 = self.voz_data[(self.voz_data.index >= testing_date[0]) & (self.voz_data.index <= testing_date[1])] #Trial 1 Period
         voz_test2 = self.voz_data[(self.voz_data.index >= testing_date[2]) & (self.voz_data.index <= testing_date[3])] #Trial 2 Period
         voz_testing_data = pd.concat([voz_test1, voz_test2])
         
-        all_testing_data = voz_testing_data.join(deployment_reference, how='inner')
+        all_testing_data = voz_testing_data.join(reference_2, how='inner')
 
         return all_testing_data
 
