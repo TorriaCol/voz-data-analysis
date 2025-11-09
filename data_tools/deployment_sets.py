@@ -17,7 +17,7 @@ def devices_2023():
 def devices_2025():
     devices = {
         "e00fce68e28dcbc9a589be10" :"CutlerOrosi",
-        "e00fce68e88237db75a60608" :"1A_8",
+        "e00fce68e88237db75a60608" :"1A8",
         "e00fce6858b443fd80f27170" :"TerraBella",
         "e00fce682bbf742cd0b6768a" :"LostHills",
         "e00fce686dc2ef0a68fa40b0" :"McFarland",
@@ -44,7 +44,7 @@ def files_2023():
 def files_2025():
     files = [
         "CutlerOrosi.csv",
-        "1A_8.csv",
+        "1A8.csv",
         "TerraBella.csv",
         "LostHills.csv",
         "McFarland.csv",
@@ -65,6 +65,17 @@ def calibrated_files_2023():
         "KettlemanCity_calibrated.csv",
         "Taft_calibrated.csv",
         "Tranquility_calibrated.csv"
+    ]
+    return files
+
+def calibrated_files_2025():
+    files = [
+        "CutlerOrosi_calibrated.csv",
+        "1A8_calibrated.csv",
+        "TerraBella_calibrated.csv",
+        "LostHills_calibrated.csv",
+        "McFarland_calibrated.csv",
+        "Coalinga_calibrated.csv"
     ]
     return files
 

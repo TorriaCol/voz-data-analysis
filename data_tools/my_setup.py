@@ -5,5 +5,5 @@ def raw_2023data_path():
 def raw_2025data_path():
     return r"../reference_files/2025rawdata/"
 
-def local_image_folder(sensor):
-    return rf"../../PMCalibrations{sensor}/"
+def local_image_folder(data, sensor):
+    return rf"../../{data}Calibrations{sensor}/"
