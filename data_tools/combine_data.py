@@ -36,8 +36,6 @@ class CreateTrainingandTestData:
 
         all_training_data = pd.concat([precal_all_data, postcal_all_data])
 
-        print(all_training_data)
-
         # all_training_data['day_counter'] = (all_training_data.index - all_training_data.index[0]).days+1
         # all_training_data['month'] = all_training_data.index.month
         # all_training_data['week'] = all_training_data.index.isocalendar().week

@@ -18,7 +18,7 @@ def eliminate_waste_data_pm(data, sensor):
 
 def eliminate_waste_data_o3(data):
     desired = [
-        'unixtime', 'temp_C', 'rh', 'o3'
+        'unixtime', 'temp_C', 'rh', 'o3',
         'lat', 'lon', 'reference'
     ]
     columns = [col for col in desired if col in data.columns]
