@@ -1,120 +1,74 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "0777c497",
-   "metadata": {},
-   "outputs": [
-    {
-     "ename": "ImportError",
-     "evalue": "attempted relative import with no known parent package",
-     "output_type": "error",
-     "traceback": [
-      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
-      "\u001b[1;31mImportError\u001b[0m                               Traceback (most recent call last)",
-      "Cell \u001b[1;32mIn[9], line 7\u001b[0m\n\u001b[0;32m      5\u001b[0m \u001b[38;5;28;01mimport\u001b[39;00m \u001b[38;5;21;01mdeployment_sets\u001b[39;00m\n\u001b[0;32m      6\u001b[0m \u001b[38;5;28;01mimport\u001b[39;00m \u001b[38;5;21;01mhandle_datetime\u001b[39;00m\n\u001b[1;32m----> 7\u001b[0m \u001b[38;5;28;01mimport\u001b[39;00m \u001b[38;5;21;01mprocess_data\u001b[39;00m \u001b[38;5;28;01mas\u001b[39;00m \u001b[38;5;21;01mprocess\u001b[39;00m\n\u001b[0;32m      9\u001b[0m file_path \u001b[38;5;241m=\u001b[39m my_setup\u001b[38;5;241m.\u001b[39mraw_2025data_path()\n\u001b[0;32m     10\u001b[0m device_names \u001b[38;5;241m=\u001b[39m deployment_sets\u001b[38;5;241m.\u001b[39mdevices_2025()\n",
-      "File \u001b[1;32mc:\\Documents\\Senior Year - College\\Research\\CalibrationCodes\\Torrias2025Calibration\\voz-data-analysis\\data_tools\\process_data.py:2\u001b[0m\n\u001b[0;32m      1\u001b[0m \u001b[38;5;28;01mimport\u001b[39;00m \u001b[38;5;21;01mpandas\u001b[39;00m \u001b[38;5;28;01mas\u001b[39;00m \u001b[38;5;21;01mpd\u001b[39;00m\n\u001b[1;32m----> 2\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01m.\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m handle_datetime\n\u001b[0;32m      4\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mref_data\u001b[39m(path):\n\u001b[0;32m      5\u001b[0m     ref_data \u001b[38;5;241m=\u001b[39m pd\u001b[38;5;241m.\u001b[39mread_csv(path)\n",
-      "\u001b[1;31mImportError\u001b[0m: attempted relative import with no known parent package"
-     ]
-    }
-   ],
-   "source": [
-    "import pandas as pd\n",
-    "\n",
-    "import handle_datetime\n",
-    "import process_data as process\n",
-    "\n",
-    "def extract_significant_movements_decimal(combined_file, device_names, output_file, decimal_threshold=0.2):\n",
-    "    try:\n",
-    "        df = process.raw_voz_data(combined_file)\n",
-    "        df = handle_datetime.utc_to_CA(df)\n",
-    "        df = df.dropna(how='any')\n",
-    "\n",
-    "        df.sort_values(['coreid', 'date_time'], inplace=True)\n",
-    "\n",
-    "        summary_rows = []\n",
-    "\n",
-    "        for device_id, group in df.groupby('coreid'):\n",
-    "            name = device_names.get(device_id, f\"Device_{device_id[:6]}\")\n",
-    "            if(\"Device\" in name):\n",
-    "                continue\n",
-    "            last_lat, last_lon = None, None\n",
-    "\n",
-    "            for pos, (i, row) in enumerate(group.iterrows()):\n",
-    "                try:\n",
-    "                    lat = float(row.get('lat', 0))\n",
-    "                    lon = float(row.get('lon', 0))\n",
-    "                except ValueError:\n",
-    "                    continue  # skip bad values\n",
-    "\n",
-    "                if pd.isna(lat) or pd.isna(lon) or abs(lat) <= 5 or abs(lon) <= 5:\n",
-    "                    continue\n",
-    "\n",
-    "                # First row\n",
-    "                if pos == 0:\n",
-    "                    summary_rows.append({\n",
-    "                        \"name\": name,\n",
-    "                        \"device_id\": device_id,\n",
-    "                        \"latitude\": lat,\n",
-    "                        \"longitude\": lon,\n",
-    "                        \"timestamp\": row['date_time']\n",
-    "                    })\n",
-    "                    last_lat, last_lon = lat, lon\n",
-    "\n",
-    "                # Last row\n",
-    "                elif pos == len(group) - 1:\n",
-    "                    lasttime = row['date_time']\n",
-    "\n",
-    "                # Middle rows\n",
-    "                else:\n",
-    "                    if last_lat is not None and last_lon is not None:\n",
-    "                        if abs(lat - last_lat) >= decimal_threshold or abs(lon - last_lon) >= decimal_threshold:\n",
-    "                            summary_rows.append({\n",
-    "                                \"name\": device_names.get(device_id, f\"Device_{device_id[:6]}\"),\n",
-    "                                \"device_id\": device_id,\n",
-    "                                \"latitude\": lat,\n",
-    "                                \"longitude\": lon,\n",
-    "                                \"timestamp\": row['date_time']\n",
-    "                            })\n",
-    "                            last_lat, last_lon = lat, lon\n",
-    "\n",
-    "            summary_rows.append({\n",
-    "                    \"name\": device_names.get(device_id, f\"Device_{device_id[:6]}\"),\n",
-    "                    \"device_id\": device_id,\n",
-    "                    \"latitude\": last_lat,\n",
-    "                    \"longitude\": last_lon,\n",
-    "                    \"timestamp\": lasttime\n",
-    "                })\n",
-    "            \n",
-    "        summary_df = pd.DataFrame(summary_rows)\n",
-    "        summary_df.to_csv(output_file, index=False)\n",
-    "        print(f\"Saved significant movement summary to {output_file}\")\n",
-    "        \n",
-    "    except Exception as e:\n",
-    "        print(f\"Error during summary extraction: {e}\")\n"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "base",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.12.4"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+import pandas as pd
+
+from . import handle_datetime
+from . import process_data as process
+
+def from_combined(combined_file, device_names, output_file, decimal_threshold=0.2):
+    try:
+        df = process.raw_voz_data(combined_file)
+        df = handle_datetime.utc_to_CA(df)
+        df = df.dropna(how='any')
+
+        df.sort_values(['coreid'], inplace=True)
+        df.sort_index(inplace=True)
+
+        summary_rows = []
+
+        for device_id, group in df.groupby('coreid'):
+            name = device_names.get(device_id, f"Device_{device_id[:6]}")
+            if("Device" in name):
+                continue
+            last_lat, last_lon = None, None
+
+            for pos, (i, row) in enumerate(group.iterrows()):
+                try:
+                    lat = float(row.get('lat', 0))
+                    lon = float(row.get('lon', 0))
+                except ValueError:
+                    continue  # skip bad values
+
+                if pd.isna(lat) or pd.isna(lon) or abs(lat) <= 5 or abs(lon) <= 5:
+                    continue
+
+                # First row - Always document first location
+                if pos == 0:
+                    summary_rows.append({
+                        "name": name,
+                        "device_id": device_id,
+                        "latitude": lat,
+                        "longitude": lon,
+                        "timestamp": i
+                    })
+                    last_lat, last_lon = lat, lon
+
+                # Last row - Always document last location
+                elif pos == len(group) - 1:
+                    lasttime = i
+
+                # Middle rows - Check for significant movements
+                else:
+                    if last_lat is not None and last_lon is not None:
+                        if abs(lat - last_lat) >= decimal_threshold or abs(lon - last_lon) >= decimal_threshold:
+                            summary_rows.append({
+                                "name": device_names.get(device_id, f"Device_{device_id[:6]}"),
+                                "device_id": device_id,
+                                "latitude": lat,
+                                "longitude": lon,
+                                "timestamp": i
+                            })
+                            last_lat, last_lon = lat, lon
+
+            summary_rows.append({
+                    "name": device_names.get(device_id, f"Device_{device_id[:6]}"),
+                    "device_id": device_id,
+                    "latitude": last_lat,
+                    "longitude": last_lon,
+                    "timestamp": lasttime
+                })
+            
+        summary_df = pd.DataFrame(summary_rows)
+        summary_df.to_csv(output_file, index=False)
+        print(f"Saved significant movement summary to {output_file}")
+        
+    except Exception as e:
+        print(f"Error during summary extraction: {e}")
