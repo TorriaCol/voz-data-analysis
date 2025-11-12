@@ -18,10 +18,11 @@ def eliminate_waste_data_pm(data, sensor):
 
 def eliminate_waste_data_o3(data):
     desired = [
-        'unixtime', 'temp_C', 'rh', 'o3',
-        'lat', 'lon', 'reference'
+        'unixtime', 'temp_C', 'rh', 'o3', 'm_PM25_CF1', 'm_PM10_CF1',
+        'lat', 'lon', 'reference', 'seasonal_bias', 'week'
     ]
     columns = [col for col in desired if col in data.columns]
     subset_cols = [col for col in columns if col != 'reference']
     cleaned_data = data.dropna(subset=subset_cols)
+    cleaned_data = cleaned_data[cleaned_data['o3'] > 10]  # Assuming ozone values below 0 are outliers
     return cleaned_data[columns]

@@ -36,9 +36,9 @@ def calibrate(training_data, variables, output_path):
         models[range_label] = model
 
     # # Save calibration coefficients
-    # params_df = pd.DataFrame(all_calibrations, columns=labels)
-    # params_df.to_csv(output_path, index=False)
-    # print(f"Calibration coefficients saved to {output_path}")
+    params_df = pd.DataFrame(all_calibrations, columns=labels)
+    params_df.to_csv(output_path, index=False)
+    print(f"Calibration coefficients saved to {output_path}")
 
     return models
 
