@@ -14,7 +14,7 @@ class PlotOzone:
 
     def __init__(self):
         self.vmin = 0
-        self.vmax = 60
+        self.vmax = 50
         self.temp_norm = Normalize(vmin=self.vmin, vmax=self.vmax)
 
     def plot(self, data, sensor_id, period):
@@ -38,7 +38,7 @@ class PlotOzone:
             c=data['temp_C'],
             cmap='RdBu_r',
             norm=self.temp_norm,
-            alpha=0.8,
+            alpha=1,
             s=5
         )
 
@@ -92,7 +92,7 @@ class PlotPlantower:
 
     def __init__(self):
         self.vmin = 0
-        self.vmax = 60
+        self.vmax = 50
         self.temp_norm = Normalize(vmin=self.vmin, vmax=self.vmax)
 
     def plot(self, data, sensor_id,period):
@@ -131,7 +131,7 @@ class PlotPlantower:
             c=data['temp_C'],
             cmap='RdBu_r',
             norm=self.temp_norm,
-            alpha=0.8,
+            alpha=1,
             s=5
         )
 
