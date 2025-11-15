@@ -20,7 +20,7 @@ class PlotOzone:
     def plot(self, data, sensor_id, period):
         fig, ax = plt.subplots(figsize=(7,6))
         imagefolder = my_setup.local_image_folder("Ozone","")
-        self._add_to_plots("o3_calibrated_prepost", f"{period} Ozone Calibration", ax, data)
+        self._add_to_plots("o3_calibrated_prepost", f"{sensor_id} {period} Ozone Calibration", ax, data)
         plt.savefig(rf"{imagefolder}{sensor_id}/{period}CalibratedStats.jpg", format='jpg', dpi=300)
 
         if(period == "All"):

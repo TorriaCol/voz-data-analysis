@@ -1,4 +1,4 @@
-name,device_id,latitude,longitude,timestamp
+name,device_id,lat,lon,timestamp
 Avenal,e00fce68e88237db75a60608,36.005257,-120.11731,8/18/2025 20:30
 Coalinguita,e00fce68e88237db75a60608,36.03764,-120.173309,7/11/2025 12:10
 CutlerOrosi,e00fce68e28dcbc9a589be10,36.526466,-119.290421,7/10/2025 17:20
