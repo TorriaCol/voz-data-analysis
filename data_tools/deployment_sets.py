@@ -61,7 +61,7 @@ def calibrated_files_2023():
         "CutlerOrosi_calibrated.csv",
         "Avenal_calibrated.csv",
         "CantuaCreek_calibrated.csv",
-        "Lanare_calibrated.csv",
+        # "Lanare_calibrated.csv",
         "LostHills_calibrated.csv",
         "KettlemanCity_calibrated.csv",
         "Taft_calibrated.csv",
@@ -95,7 +95,11 @@ def CARB_IDs():
         "Visalia": 3863,
         "Fresno-Drummond": 2013,
         "Parlier": 2114,
-        "Shafter": 2981
+        "Shafter": 2981,
+        "Sequoia": 3484,
+        "Madera": 3771,
+        "Bakersfield Airport": 3787,
+        "Bakersfield": 3146
     }
     return IDs
 

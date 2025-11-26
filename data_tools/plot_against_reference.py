@@ -265,3 +265,139 @@ class PlotSensirion:
         nme = np.nanmean(np.divide(abs(predicted - observed), observed, out=np.zeros_like(abs(predicted - observed)), where=observed!=0))
         
         return r2, rmse, mbe, nmb, nme
+    
+
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
+import matplotlib.dates as mdates
+import pandas as pd
+import matplotlib as mpl
+
+def timeseries(timeseries, start_date, end_date, variable, sensor=""):
+
+    mpl.rcParams['font.family'] = 'Arial'        # your preferred font
+    mpl.rcParams['font.size'] = 12               # default size
+    mpl.rcParams['xtick.labelsize'] = 12
+    mpl.rcParams['ytick.labelsize'] = 12
+    mpl.rcParams['axes.labelsize'] = 14
+    fig,ax = plt.subplots(figsize=(12, 6))
+
+    plt.fill_between(
+        timeseries.index,
+        timeseries['ref_mean']-timeseries['ref_2std'],
+        timeseries['ref_mean']+timeseries['ref_2std'],
+        color='lightgray',
+        alpha=0.65,
+        label='3 Standard Deviations',
+        zorder=1
+    )
+
+    # 25th to 75th percentile (dark gray)
+    plt.fill_between(
+        timeseries.index,
+        timeseries['ref_mean']-timeseries['ref_std'],
+        timeseries['ref_mean']+timeseries['ref_std'],
+        color='darkgray',
+        alpha=0.75,
+        label='1 Standard Deviation',
+        zorder=2
+    )
+
+    # Median as a dashed line
+    plt.plot(
+        timeseries.index,
+        timeseries['ref_mean'],
+        color='black',
+        linestyle='--',
+        linewidth=2,
+        label='Mean',
+        zorder=3
+    )
+
+    plt.fill_between(
+        timeseries.index,
+        timeseries['voz_mean']-timeseries['voz_2std'],
+        timeseries['voz_mean']+timeseries['voz_2std'],
+        color="#ff7f0e",
+        alpha=0.15,
+        label='3 Standard Deviations',
+        zorder=4
+    )
+
+    # 25th to 75th percentile (dark gray)
+    plt.fill_between(
+        timeseries.index,
+        timeseries['voz_mean']-timeseries['voz_std'],
+        timeseries['voz_mean']+timeseries['voz_std'],
+        color="#ff7f0e",
+        alpha=0.35,
+        label='1 Standard Deviation',
+        zorder=5
+    )
+
+    plt.plot(
+        timeseries.index,
+        timeseries['voz_mean'],
+        color="#ff7f0e",
+        linewidth=2,
+        label='Mean',
+        zorder=6
+    )
+
+    mean_line_ref = [Line2D([0], [0], color='black', linestyle='--', label='Mean (CARB)')]
+    mean_line_voz = [Line2D([0], [0], color='#ff7f0e', linestyle='-', label='Mean (Voz)')]
+
+    if(variable == "Ozone"):
+        ax.axhline(y=70, color='red', linestyle='-', linewidth=2, label='High Ozone',zorder=7)
+        ax.text(0.12, 0.925, "EPA Health Standard = 70 ppb", transform=ax.transAxes, ha='center', fontsize=12, color = 'red')
+        ax.text(0.5, 1.02, "Max Daily 8-Hour Averages - Smoothed", transform=ax.transAxes, ha='center', fontsize=12)
+    else:
+        ax.axhline(y=9, color='red', linestyle='-', linewidth=2, label='High PM',zorder=7)
+        ax.text(0.12, 0.925, "EPA Health Standard = 9 ug/m3", transform=ax.transAxes, ha='center', fontsize=12, color = 'red')
+
+    # --- Patches for standard deviations ---
+    ref_patches = [
+        Patch(facecolor='gray', label='1 Std (CARB)'),
+        Patch(facecolor='lightgray', label='2 Std (CARB)')
+    ]
+
+    voz_patches = [
+        Patch(facecolor='#ffb347', label='1 Std (Voz)'),
+        Patch(facecolor='#ffd8b1', label='2 Std (Voz)')
+    ]
+
+    # --- Combine and plot legend ---
+    plt.legend(handles=mean_line_ref + ref_patches + mean_line_voz + voz_patches,
+            title='',
+            loc='upper right',
+            frameon=True,
+            ncol=2,
+            columnspacing=1.5,
+            handlelength=2)
+
+    ax.set_title(f"{variable} Timeseries of Voz Monitors vs. CARB References\n", fontsize=14, fontweight = 'bold')
+    plt.tight_layout()
+    # --- First day of each month within the plot ---
+    month_starts = pd.date_range(start=start_date.replace(day=1), end=end_date, freq='MS')
+    first_last = pd.DatetimeIndex([start_date, end_date])
+    all_ticks = month_starts.union(first_last)
+    ax.set_xticks(all_ticks)
+    ax.set_yticks([0,10,20,30,40,50,60,70,80,90])
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))  # e.g., 'Jun 15'
+
+    # voz_mda8_daily.to_csv("../reference_files/2025OzoneDataCalibrated/AllMDA8Voz.csv")
+
+    # Optional: rotate labels for readability
+    plt.xticks(rotation=45)
+    plt.grid(True, alpha=0.3)
+    if(variable == "Ozone"):
+        ax.set_ylim(0,90)
+        plt.ylabel("Ozone [ppb]", fontweight = 'bold')
+    else:
+        ax.set_ylim(0,70)
+        plt.ylabel("PM2.5 [ug/m3]", fontweight = 'bold')
+    ax.set_xlim(start_date,end_date)
+    plt.tight_layout()
+    plt.xlabel("")
+    plt.savefig(rf"../../PlotsForRubenNov25/{sensor}{variable}Timeseries.jpg", format='jpg', dpi=300)
+    # plt.show()
