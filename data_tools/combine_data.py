@@ -95,5 +95,6 @@ class CreateTrainingandTestData:
         subsection_data = pd.concat(cut_sections).sort_index()
         return subsection_data
 
-    
+    def columns_across_monitors(variable, names, data):
+        
     
