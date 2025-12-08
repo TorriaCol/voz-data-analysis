@@ -108,8 +108,7 @@ def plot_status_heatmaps(status_folder, datetime_col, vars_to_test, sensor_names
     # Hide unused subplots
     for j in range(i + 1, rows * cols):
         fig.delaxes(axes[j // cols][j % cols])
-
-    plt.savefig(rf"../../2025DeploymentPlots/DataAvailability.jpg", format='jpg', dpi=300)
     
     plt.tight_layout()
+    plt.savefig(rf"../../2025DeploymentPlots/DataAvailability.jpg", format='jpg', dpi=300, bbox_inches='tight')
     plt.show()
