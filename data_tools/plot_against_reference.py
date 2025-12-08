@@ -97,10 +97,11 @@ class PlotPlantower:
         self.vmax = 50
         self.temp_norm = Normalize(vmin=self.vmin, vmax=self.vmax)
 
-    def plot(self, data, sensor_id,period):
+    def plot(self, data, sensor_id,period,calibration):
         # Set up 2x2 grid of subplots
         fig, axs = plt.subplots(2, 2, figsize=(14,12))
         fig.suptitle(f"{period} Data: {sensor_id} Calibration Model Comparison\n", fontsize=18)
+        fig.text(0.5, 0.945, f"{calibration} Calibration", ha='center', fontsize=12, fontstyle='italic')
         fig.text(0.5, 0.92, "Unit-Specific Models", ha='center', fontsize=14, fontweight='bold')
         fig.subplots_adjust(hspace=0.3)  # increase vertical space between rows
         fig.text(0.5,0.48,"Universal Models", ha='center', fontsize=14, fontweight='bold' )
@@ -110,7 +111,7 @@ class PlotPlantower:
         self._add_to_plots(1,1,'pm_calibrated_epa_barkjohn', 'EPA Barkjohn 2021', axs, data)
         self._add_to_plots(1,0,'pm_calibrated_clarity', 'Clarity v2', axs, data)
         imagefolder = my_setup.local_image_folder("PM","Plantower")
-        plt.savefig(rf"{imagefolder}{sensor_id}/{period}CalibrationStatswEPA.jpg", format='jpg', dpi=300)
+        plt.savefig(rf"{imagefolder}{sensor_id}/{period}{calibration}CalibrationStatswEPA.jpg", format='jpg', dpi=300)
 
         fig, ax = plt.subplots(figsize=(7,6))
         self._add_to_plots(0,0,'m_PM25_CF1', 'Raw Plantower CF1', ax, data)  # pass ax instead of axs grid
@@ -140,10 +141,11 @@ class PlotPlantower:
         # Add 1:1 line
         ax.plot([0, 100], [0, 100], c='black', linestyle='--', label='1:1')
 
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-        y_fit = slope * x + intercept
-
-        ax.plot(x, y_fit, c = 'red', label = 'Best fit')
+        # Line of best fit
+        # slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+        # y_fit = slope * x + intercept
+        # ax.plot(x, y_fit, c = 'red', label = 'Best fit')
+        # ax.text(0.55, 0.03, f'y = {slope:.2f}x + {intercept:.2f}',transform=ax.transAxes, fontsize=13, verticalalignment='bottom')
 
         # Metrics
         r2, rmse, mbe, nmb, nme = self._calculate_metrics(data['reference'], data[model])
@@ -153,7 +155,6 @@ class PlotPlantower:
         ax.text(0.1, 0.73, f'NMB = {nmb:.2%}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
         ax.text(0.1, 0.66, f'NME = {nme:.2%}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
         ax.text(0.1, 0.59, f'Data Points = {len(data)}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
-        ax.text(0.55, 0.03, f'y = {slope:.2f}x + {intercept:.2f}',transform=ax.transAxes, fontsize=13, verticalalignment='bottom')
 
         # Colorbar
         sm = ScalarMappable(cmap='RdBu_r', norm=self.temp_norm)
@@ -189,16 +190,17 @@ class PlotSensirion:
         self.vmax = 60
         self.temp_norm = Normalize(vmin=self.vmin, vmax=self.vmax)
 
-    def plot(self, data, sensor_id,period):
+    def plot(self, data, sensor_id,period,calibration):
         # Set up 1x3 grid of subplots
         fig, axs = plt.subplots(1, 3, figsize=(18,6))
         fig.suptitle(f"{period} Data: {sensor_id} Calibration Model Comparison\n", fontsize=16)
+        fig.text(0.5, 0.92, f"{calibration} Calibration", ha='center', fontsize=14)
         fig.subplots_adjust(hspace=0.3)  # increase vertical space between rows
         self._add_to_plots(2,'pm_calibrated_clarityremake', 'Clarity v2 Variables - PM10', axs, data)
         self._add_to_plots(1,'pm_calibrated_twovar', 'RH + PM2.5', axs, data)
         self._add_to_plots(0,'m_PM25_b', 'Raw Data', axs, data)
         imagefolder = my_setup.local_image_folder("PM","Sensirion")
-        plt.savefig(rf"{imagefolder}{sensor_id}/{period}CalibrationStats.jpg", format='jpg', dpi=300)
+        plt.savefig(rf"{imagefolder}{sensor_id}/{period}{calibration}CalibrationStats.jpg", format='jpg', dpi=300)
 
     def _add_to_plots(self, i, model, name, axs, data):
     # If axs is a 2D array (grid)
@@ -223,10 +225,11 @@ class PlotSensirion:
         # Add 1:1 line
         ax.plot([0, 100], [0, 100], c='black', linestyle='--', label='1:1')
 
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-        y_fit = slope * x + intercept
-
-        ax.plot(x, y_fit, c = 'red', label = 'Best fit')
+        # Line of best fit
+        # slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+        # y_fit = slope * x + intercept
+        # ax.plot(x, y_fit, c = 'red', label = 'Best fit')
+        # ax.text(0.55, 0.03, f'y = {slope:.2f}x + {intercept:.2f}',transform=ax.transAxes, fontsize=11, verticalalignment='bottom')
 
         # Metrics
         r2, rmse, mbe, nmb, nme = self._calculate_metrics(data['reference'], data[model])
@@ -236,7 +239,6 @@ class PlotSensirion:
         ax.text(0.1, 0.73, f'NMB = {nmb:.2%}', transform=ax.transAxes, fontsize=11, verticalalignment='top')
         ax.text(0.1, 0.66, f'NME = {nme:.2%}', transform=ax.transAxes, fontsize=11, verticalalignment='top')
         ax.text(0.1, 0.59, f'Data Points = {len(data)}', transform=ax.transAxes, fontsize=11, verticalalignment='top')
-        ax.text(0.55, 0.03, f'y = {slope:.2f}x + {intercept:.2f}',transform=ax.transAxes, fontsize=11, verticalalignment='bottom')
 
         # Colorbar
         sm = ScalarMappable(cmap='RdBu_r', norm=self.temp_norm)
@@ -314,26 +316,26 @@ def timeseries(timeseries, start_date, end_date, variable, sensor=""):
         zorder=3
     )
 
-    plt.fill_between(
-        timeseries.index,
-        timeseries['voz_mean']-timeseries['voz_2std'],
-        timeseries['voz_mean']+timeseries['voz_2std'],
-        color="#ff7f0e",
-        alpha=0.15,
-        label='3 Standard Deviations',
-        zorder=4
-    )
+    # plt.fill_between(
+    #     timeseries.index,
+    #     timeseries['voz_mean']-timeseries['voz_2std'],
+    #     timeseries['voz_mean']+timeseries['voz_2std'],
+    #     color="#ff7f0e",
+    #     alpha=0.15,
+    #     label='3 Standard Deviations',
+    #     zorder=4
+    # )
 
-    # 25th to 75th percentile (dark gray)
-    plt.fill_between(
-        timeseries.index,
-        timeseries['voz_mean']-timeseries['voz_std'],
-        timeseries['voz_mean']+timeseries['voz_std'],
-        color="#ff7f0e",
-        alpha=0.35,
-        label='1 Standard Deviation',
-        zorder=5
-    )
+    # # 25th to 75th percentile (dark gray)
+    # plt.fill_between(
+    #     timeseries.index,
+    #     timeseries['voz_mean']-timeseries['voz_std'],
+    #     timeseries['voz_mean']+timeseries['voz_std'],
+    #     color="#ff7f0e",
+    #     alpha=0.35,
+    #     label='1 Standard Deviation',
+    #     zorder=5
+    # )
 
     plt.plot(
         timeseries.index,
@@ -353,7 +355,7 @@ def timeseries(timeseries, start_date, end_date, variable, sensor=""):
         ax.text(0.5, 1.02, "Max Daily 8-Hour Averages - Smoothed", transform=ax.transAxes, ha='center', fontsize=12)
     else:
         ax.axhline(y=9, color='red', linestyle='-', linewidth=2, label='High PM',zorder=7)
-        ax.text(0.12, 0.925, "EPA Health Standard = 9 ug/m3", transform=ax.transAxes, ha='center', fontsize=12, color = 'red')
+        ax.text(0.12, 1.01, "EPA Health Standard = 9 ug/m3", transform=ax.transAxes, ha='center', fontsize=12, color = 'red')
 
     # --- Patches for standard deviations ---
     ref_patches = [
@@ -361,13 +363,13 @@ def timeseries(timeseries, start_date, end_date, variable, sensor=""):
         Patch(facecolor='lightgray', label='2 Std (CARB)')
     ]
 
-    voz_patches = [
-        Patch(facecolor='#ffb347', label='1 Std (Voz)'),
-        Patch(facecolor='#ffd8b1', label='2 Std (Voz)')
-    ]
+    # voz_patches = [
+    #     Patch(facecolor='#ffb347', label='1 Std (Voz)'),
+    #     Patch(facecolor='#ffd8b1', label='2 Std (Voz)')
+    # ]
 
     # --- Combine and plot legend ---
-    plt.legend(handles=mean_line_ref + ref_patches + mean_line_voz + voz_patches,
+    plt.legend(handles=mean_line_ref + mean_line_voz + ref_patches, #+ voz_patches,
             title='',
             loc='upper right',
             frameon=True,

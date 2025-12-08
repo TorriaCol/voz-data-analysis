@@ -24,6 +24,8 @@ class CreateTrainingandTestData:
         training = self._get_training_data(training_date,reference_1,reference_2)
         testing = self._get_testing_data(testing_date, reference_1, reference_2)
         all_training_data = self._with_reference(training,testing)
+        all_training_data = clean_data.eliminate_outliers(all_training_data,self.variable)
+        training = clean_data.eliminate_outliers(training,self.variable)
         return training, all_training_data
 
     def _get_training_data(self,training_date, reference_1, reference_2):
@@ -36,12 +38,6 @@ class CreateTrainingandTestData:
 
         all_training_data = pd.concat([precal_all_training_data, postcal_all_training_data])
 
-        # all_training_data['day_counter'] = (all_training_data.index - all_training_data.index[0]).days+1
-        # all_training_data['month'] = all_training_data.index.month
-        # all_training_data['week'] = all_training_data.index.isocalendar().week
-        
-        all_training_data = clean_data.eliminate_outliers(all_training_data,self.variable)
-
         if(self.variable == 'o3'):
             all_training_data['week'] = all_training_data.index.isocalendar().week
             all_training_data['seasonal_bias'] = all_training_data['week'].apply(lambda x: 1 if 23 <= x <= 40 else 0)
@@ -53,7 +49,7 @@ class CreateTrainingandTestData:
         voz_test2 = self.voz_data[(self.voz_data.index >= testing_date[2]) & (self.voz_data.index <= testing_date[3])] #Trial 2 Period
         voz_testing_data = pd.concat([voz_test1, voz_test2])
         
-        all_testing_data = voz_testing_data.join(reference_1, how='inner')
+        all_testing_data = voz_testing_data.join(reference_2, how='inner')
 
         if(self.variable == 'o3'):
             all_testing_data['week'] = all_testing_data.index.isocalendar().week
@@ -76,6 +72,7 @@ class CreateTrainingandTestData:
         if(self.variable == 'o3'):
             all_training_data['week'] = all_training_data.index.isocalendar().week
             all_training_data['seasonal_bias'] = all_training_data['week'].apply(lambda x: 1 if 23 <= x <= 40 else 0)
+            
         
         return all_training_data
     
@@ -94,7 +91,3 @@ class CreateTrainingandTestData:
         # Combine all sections
         subsection_data = pd.concat(cut_sections).sort_index()
         return subsection_data
-
-    def columns_across_monitors(variable, names, data):
-        
-    

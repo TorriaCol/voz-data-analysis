@@ -1,8 +1,8 @@
 import pandas as pd
 
-def training(sensor_id, year):
+def training(sensor_id, year,calibration):
     # Read date_file
-    dates = read_date_file(sensor_id, year)
+    dates = read_date_file(sensor_id, year,calibration)
 
     # Assign training dates
     training_dates = [
@@ -14,9 +14,9 @@ def training(sensor_id, year):
 
     return training_dates
 
-def testing(sensor_id, year):
+def testing(sensor_id, year,calibration):
     # Read date_file
-    dates = read_date_file(sensor_id, year)
+    dates = read_date_file(sensor_id, year,calibration)
 
     # Assign testing dates
     testing_dates = [
@@ -28,9 +28,9 @@ def testing(sensor_id, year):
 
     return testing_dates
 
-def read_date_file(sensor_id, year):
+def read_date_file(sensor_id, year, calibration):
     date_file = rf"../reference_files/{year}_deployment_dates.xlsx"
-    all_dates = pd.read_excel(date_file, sheet_name=1)
+    all_dates = pd.read_excel(date_file, sheet_name=calibration)
     dates = all_dates.loc[all_dates['sensor_id'] == sensor_id].squeeze()
     date_columns = [col for col in dates.index if col not in ['sensor_id', 'PreNumDays', 'PostNumDays', 'WithFEM']]
     dates[date_columns] = pd.to_datetime(dates[date_columns])

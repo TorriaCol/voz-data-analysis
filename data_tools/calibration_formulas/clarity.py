@@ -14,9 +14,9 @@ class ClarityCalibrator:
         return Td
 
     def add_necessary_variables(self, data, sensor):
-        data['dew_point'] = self.calc_dew_point(data['temp_C'], data['rh'])
-        data['temp_minus_dew_point'] = data['temp_C'] - data['dew_point']
-        data['pm_rh_interaction'] = data[sensor["pm2.5"]] * data['rh']
+        data['dew_point'] = self.calc_dew_point(data[sensor['temp']], data[sensor['rh']])
+        data['temp_minus_dew_point'] = data[sensor['temp']] - data['dew_point']
+        data['pm_rh_interaction'] = data[sensor["pm2.5"]] * data[sensor['rh']]
         return data
 
     def get_parameters(self):

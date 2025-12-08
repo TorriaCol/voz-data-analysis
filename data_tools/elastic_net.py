@@ -17,9 +17,9 @@ def calibrate(training_data, variables, output_path):
 
     # Define piecewise ranges
     ranges = [
-        # (lambda x: x <= 10, "10 and under"),
+        (lambda x: x <= 10, "10 and under"),
         # (lambda x: (x > 3) & (x <= 10), "5 - 15"),
-        (lambda x: x >= 0 , "0+")
+        (lambda x: x > 10 , "10+")
     ]
 
     labels = ["range"] + variables + ["intercept"]
@@ -77,9 +77,9 @@ def apply_calibration(models, all_data, variables, new_column):
 
     # Define same piecewise ranges
     ranges = [
-        # (lambda x: x <= 10, "10 and under"),
+        (lambda x: x <= 10, "10 and under"),
         # (lambda x: (x > 3) & (x <= 10), "5 - 15"),
-        (lambda x: x >= 0 , "0+")
+        (lambda x: x > 10 , "10+")
     ]
 
     for condition_func, range_label in ranges:
@@ -96,6 +96,7 @@ def apply_calibration(models, all_data, variables, new_column):
 
         model = models[range_label]
         predictions = model.predict(subset_data[variables])
+
         all_data.loc[subset_data.index, new_column] = predictions
 
     print(f"Applied calibration models; results stored in '{new_column}'")
