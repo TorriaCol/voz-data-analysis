@@ -7,3 +7,6 @@ def raw_2025data_path():
 
 def local_image_folder(data, sensor):
     return rf"../../{data}Calibrations{sensor}/"
+
+def demonstration_path():
+    return r"../reference_files/demonstration/"

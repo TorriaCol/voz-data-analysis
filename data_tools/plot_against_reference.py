@@ -194,7 +194,8 @@ class PlotSensirion:
         # Set up 1x3 grid of subplots
         fig, axs = plt.subplots(1, 3, figsize=(18,6))
         fig.suptitle(f"{period} Data: {sensor_id} Calibration Model Comparison\n", fontsize=16)
-        fig.text(0.5, 0.92, f"{calibration} Calibration", ha='center', fontsize=14)
+        fig.text(0.5, 0.915, f"{calibration} Calibration", ha='center', fontsize=12, fontstyle='italic')
+        plt.subplots_adjust(top=0.82)
         fig.subplots_adjust(hspace=0.3)  # increase vertical space between rows
         self._add_to_plots(2,'pm_calibrated_clarityremake', 'Clarity v2 Variables - PM10', axs, data)
         self._add_to_plots(1,'pm_calibrated_twovar', 'RH + PM2.5', axs, data)

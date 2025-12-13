@@ -1,8 +1,8 @@
 import numpy as np
 
-def eliminate_outliers(data, column, z_threshold=8):
+def eliminate_outliers(data, column, z_threshold=3):
     # 1. Z-score for recorded values only (your existing method)
-    data['z_recorded'] = (data[column] - data[column].mean()) / data[column].std()
+    # data['z_recorded'] = (data[column] - data[column].mean()) / data[column].std()
 
     # 2. Compute residuals (difference between recorded and reference)
     data['residual'] = data[column] - data['reference']
@@ -11,7 +11,7 @@ def eliminate_outliers(data, column, z_threshold=8):
     data['z_residual'] = (data['residual'] - data['residual'].mean()) / data['residual'].std()
 
     # 4. Keep rows where both z-scores are within threshold
-    data_clean = data[(data['z_recorded'].abs() <= z_threshold) & (data['z_residual'].abs() <= z_threshold)]
+    data_clean = data[(data['z_residual'].abs() <= z_threshold)]
     return data_clean
 
 def eliminate_waste_data_pm(data, sensor):
