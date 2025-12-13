@@ -7,8 +7,16 @@ import deployment_sets as sets
 import my_setup as my
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+# Define start/end dates
+start_date = datetime.strptime("2025-06-19", "%Y-%m-%d")
+end_date = datetime.strptime("2025-11-15", "%Y-%m-%d")
+
+### Uncomment for demonstration
+output_folder_path = my.demonstration_path()
+
 ### Uncomment for use with 2025 data
-output_folder_path = my.raw_2025data_path()
+# output_folder_path = my.raw_2025data_path()
 
 # ### Uncomment for use with 2023 data
 # output_folder_path = my.raw_2023data_path()
@@ -76,27 +84,23 @@ if __name__ == "__main__":
     output_combined_csv = "combined_data.csv"
 
     # # ### Uncomment for use with moospmV3_daily folder
-    # folder_path = "moospmV3_daily"  
+    folder_path = "moospmV3_daily"  
 
 ## Uncomment for use with moospmV3_cal 
-    folder_path = "moospmV3_cal"  
-
-    # Define start/end dates
-    start_date = datetime.strptime("2025-06-19", "%Y-%m-%d")
-    end_date = datetime.strptime("2025-11-05", "%Y-%m-%d")
+    # folder_path = "moospmV3_cal"  
 
 # ### Uncomment for use with moospmV3_daily
-#     target_filename = [
-#         f"moospmV3_{(start_date + timedelta(days=i)).strftime('%Y-%m-%d')}.csv"
-#         for i in range((end_date - start_date).days + 1)
-#     ]
+    target_filename = [
+        f"moospmV3_{(start_date + timedelta(days=i)).strftime('%Y-%m-%d')}.csv"
+        for i in range((end_date - start_date).days + 1)
+    ]
 
 ## Uncomment for use with moospmV3_cal
-    target_filename = [
-    f"moospmV3_cal_{(start_date + timedelta(days=i)).strftime('%Y-%m-%d')}T{hour:02d}.csv"
-    for i in range((end_date - start_date).days + 1)
-    for hour in range(24)
-    ]
+    # target_filename = [
+    # f"moospmV3_cal_{(start_date + timedelta(days=i)).strftime('%Y-%m-%d')}T{hour:02d}.csv"
+    # for i in range((end_date - start_date).days + 1)
+    # for hour in range(24)
+    # ]
 
     # Pull list of URLs (but do NOT save them individually)
     csv_files = fetch_github_csv_files(github_repo_url, folder_path, target_filename)

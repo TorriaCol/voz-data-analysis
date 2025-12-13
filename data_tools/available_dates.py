@@ -12,24 +12,29 @@ def generate_variable_working_csvs(path, files, datetime_col, vars_to_test):
     for fname in files:
         print(f"Processing {fname}...")
         fpath = os.path.join(path, fname)
-        df = pd.read_csv(fpath, parse_dates=[datetime_col])
+        try:
+            df = pd.read_csv(fpath, parse_dates=[datetime_col])
 
-        # New DataFrame containing datetime + tested variables
-        status_df = pd.DataFrame()
-        status_df[datetime_col] = df[datetime_col]
+                    # New DataFrame containing datetime + tested variables
+            status_df = pd.DataFrame()
+            status_df[datetime_col] = df[datetime_col]
 
-        # Create 0/1 status columns
-        for var in vars_to_test:
-            status_df[var] = df[var].apply(
-                lambda x: 1 if (pd.notna(x) and 0 <= x < 200) else 0
-            )
+            # Create 0/1 status columns
+            for var in vars_to_test:
+                status_df[var] = df[var].apply(
+                    lambda x: 1 if (pd.notna(x) and 0 <= x < 200) else 0
+                )
 
-        # Save to CSV
-        out_name = f"{os.path.splitext(fname)[0]}_status.csv"
-        out_path = os.path.join(output_dir, out_name)
-        status_df.to_csv(out_path, index=False)
+            # Save to CSV
+            out_name = f"{os.path.splitext(fname)[0]}_status.csv"
+            out_path = os.path.join(output_dir, out_name)
+            status_df.to_csv(out_path, index=False)
 
-        print(f"Saved → {out_path}")
+            print(f"Saved → {out_path}")
+            
+        except FileNotFoundError:
+            df = None   # or just `pass` / `continue` if inside a loop
+
 
 import math
 import matplotlib.pyplot as plt
@@ -110,5 +115,5 @@ def plot_status_heatmaps(status_folder, datetime_col, vars_to_test, sensor_names
         fig.delaxes(axes[j // cols][j % cols])
     
     plt.tight_layout()
-    plt.savefig(rf"../../2025DeploymentPlots/DataAvailability.jpg", format='jpg', dpi=300, bbox_inches='tight')
+    # plt.savefig(rf"../../2025DeploymentPlots/DataAvailability.jpg", format='jpg', dpi=300, bbox_inches='tight')
     plt.show()
