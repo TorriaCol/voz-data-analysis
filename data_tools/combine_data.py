@@ -49,7 +49,9 @@ class CreateTrainingandTestData:
         voz_test2 = self.voz_data[(self.voz_data.index >= testing_date[2]) & (self.voz_data.index <= testing_date[3])] #Trial 2 Period
         voz_testing_data = pd.concat([voz_test1, voz_test2])
         
-        all_testing_data = voz_testing_data.join(reference_2, how='inner')
+        testing_data_1 = voz_testing_data.join(reference_1, how='inner')
+        testing_data_2 = voz_testing_data.join(reference_2, how='inner')
+        all_testing_data = pd.concat([testing_data_1, testing_data_2])
 
         if(self.variable == 'o3'):
             all_testing_data['week'] = all_testing_data.index.isocalendar().week
