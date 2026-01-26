@@ -17,13 +17,13 @@ class PlotOzone:
         self.vmax = 50
         self.temp_norm = Normalize(vmin=self.vmin, vmax=self.vmax)
 
-    def plot(self, data, sensor_id, period):
+    def plot(self, data, sensor_id, period,calibration):
         fig, ax = plt.subplots(figsize=(7,6))
         imagefolder = my_setup.local_image_folder("Ozone","")
 
         if "o3_calibrated_prepost" in data.columns:
             self._add_to_plots("o3_calibrated_prepost", f"{sensor_id}", ax, data)
-            plt.savefig(rf"{imagefolder}{sensor_id}/{period}PreCalibratedStats.jpg", format='jpg', dpi=300)
+            plt.savefig(rf"{imagefolder}{sensor_id}/{period}{calibration}CalibratedStats.jpg", format='jpg', dpi=300)
 
         if(period == "All"):
             fig, ax = plt.subplots(figsize=(7,6))
@@ -402,5 +402,5 @@ def timeseries(timeseries, start_date, end_date, variable, sensor=""):
     ax.set_xlim(start_date,end_date)
     plt.tight_layout()
     plt.xlabel("")
-    plt.savefig(rf"../../PlotsForRubenNov25/{sensor}{variable}Timeseries.jpg", format='jpg', dpi=300)
+    # plt.savefig(rf"../../PlotsForRubenNov25/{sensor}{variable}Timeseries.jpg", format='jpg', dpi=300)
     # plt.show()
