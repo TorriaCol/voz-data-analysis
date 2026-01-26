@@ -23,10 +23,10 @@ class CreateTrainingandTestData:
     def get_combined_data(self,training_date,testing_date,reference_1,reference_2):
         training = self._get_training_data(training_date,reference_1,reference_2)
         testing = self._get_testing_data(testing_date, reference_1, reference_2)
-        all_training_data = self._with_reference(training,testing)
-        all_training_data = clean_data.eliminate_outliers(all_training_data,self.variable)
+        all_data = self._with_reference(training,testing)
+        all_data = clean_data.eliminate_outliers(all_data,self.variable)
         training = clean_data.eliminate_outliers(training,self.variable)
-        return training, all_training_data
+        return training, all_data
 
     def _get_training_data(self,training_date, reference_1, reference_2):
         # Merge the datasets for precalibration

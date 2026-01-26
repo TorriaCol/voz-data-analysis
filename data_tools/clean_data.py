@@ -1,17 +1,30 @@
 import numpy as np
 
 def eliminate_outliers(data, column, z_threshold=3):
-    # 1. Z-score for recorded values only (your existing method)
-    # data['z_recorded'] = (data[column] - data[column].mean()) / data[column].std()
+    data = data.copy()
 
-    # 2. Compute residuals (difference between recorded and reference)
+    # 0. Hard bounds backup filter
+    in_physical_range = data[column].between(0, 100)
+
+    # 1. Compute residuals where possible
     data['residual'] = data[column] - data['reference']
 
-    # 3. Z-score of residuals to catch misalignment outliers
+    # 2. Z-score of residuals (NaNs ignored)
     data['z_residual'] = (data['residual'] - data['residual'].mean()) / data['residual'].std()
 
-    # 4. Keep rows where both z-scores are within threshold
-    data_clean = data[(data['z_residual'].abs() <= z_threshold)]
+    # 3. Mask for rows with reference
+    has_ref = data['reference'].notna()
+
+    # 4. Combine rules:
+    #    - must be in physical range
+    #    - and either:
+    #         * no reference (skip z test)
+    #         * or z_residual within threshold
+    data_clean = data[
+        in_physical_range &
+        ( (~has_ref) | (data['z_residual'].abs() <= z_threshold) )
+    ]
+
     return data_clean
 
 def eliminate_waste_data_pm(data, sensor):
