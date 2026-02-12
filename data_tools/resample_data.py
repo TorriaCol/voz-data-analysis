@@ -7,10 +7,10 @@ import my_setup as my
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 ### Uncomment for demonstration video
-input_folder_path = my.demonstration_path()
+# input_folder_path = my.demonstration_path()
 
 ### Uncomment for use with 2025 data
-# input_folder_path = my.raw_2025data_path()
+input_folder_path = my.raw_2025data_path()
 
 # ### Uncomment for use with 2023 data
 # input_folder_path = my.raw_2023data_path()

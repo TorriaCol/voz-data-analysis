@@ -17,63 +17,89 @@ class PlotOzone:
         self.vmax = 50
         self.temp_norm = Normalize(vmin=self.vmin, vmax=self.vmax)
 
-    def plot(self, data, sensor_id, period,calibration):
+    def plot(self, data, sensor_id, period, calibration, color_by='temperature'):
+        """
+        color_by: 'temperature' (default) or 'date'
+        """
         fig, ax = plt.subplots(figsize=(7,6))
         imagefolder = my_setup.local_image_folder("Ozone","")
 
-        if "o3_calibrated_prepost" in data.columns:
-            self._add_to_plots("o3_calibrated_prepost", f"{sensor_id}", ax, data)
-            plt.savefig(rf"{imagefolder}{sensor_id}/{period}{calibration}CalibratedStats.jpg", format='jpg', dpi=300)
+        if "o3_calibrated" in data.columns:
+            self._add_to_plots("o3_calibrated", f"{sensor_id}", ax, data, color_by)
+            if color_by == 'date':
+                plt.savefig(rf"{imagefolder}{sensor_id}/{period}{calibration}PreVsPostTrainingData.jpg", format='jpg', dpi=300)
+            else:
+                plt.savefig(rf"{imagefolder}{sensor_id}/{period}{calibration}CalibratedStats.jpg", format='jpg', dpi=300)
 
-        if(period == "All"):
-            fig, ax = plt.subplots(figsize=(7,6))
-            self._add_to_plots("o3","Raw Ozone",ax,data)
-            plt.savefig(rf"{imagefolder}{sensor_id}/RawStats.jpg", format='jpg', dpi=300)
+        # if(period == "All"):
+        #     fig, ax = plt.subplots(figsize=(7,6))
+        #     self._add_to_plots("o3","Raw Ozone", ax, data, color_by)
+        #     plt.savefig(rf"{imagefolder}{sensor_id}/RawStats.jpg", format='jpg', dpi=300)
 
-    def _add_to_plots(self, model, name, ax, data):
+    def _add_to_plots(self, model, name, ax, data, color_by='temperature'):
         x = data['reference']
         y = data[model]
 
-        ax.scatter(
-            x,
-            y,
-            c=data['temp_C'],
-            cmap='RdBu_r',
-            norm=self.temp_norm,
-            alpha=1,
-            s=5
-        )
+        # Determine colors based on color_by parameter
+        if color_by == 'date':
+            # Date-based coloring
+            dates = pd.to_datetime(data.index)  # or pd.to_datetime(data['your_date_column'])
+            august_cutoff = pd.Timestamp('2025-08-01')  # Adjust year as needed
+            colors = ['red' if date < august_cutoff else 'blue' for date in dates]
+            
+            ax.scatter(x, y, c=colors, alpha=0.6, s=5)
+            
+            # Add legend for date colors
+            from matplotlib.patches import Patch
+            legend_elements = [
+                Patch(facecolor='red', alpha=0.6, label='Pre-Field'),
+                Patch(facecolor='blue', alpha=0.6, label='Post-Field')
+            ]
+            ax.legend(handles=legend_elements, loc='lower right', fontsize=10)
+            
+        else:  # default to temperature
+            # Temperature-based coloring (original)
+            ax.scatter(
+                x,
+                y,
+                c=data['temp_C'],
+                cmap='RdBu_r',
+                norm=self.temp_norm,
+                alpha=1,
+                s=5
+            )
+            
+            # Colorbar
+            sm = ScalarMappable(cmap='RdBu_r', norm=self.temp_norm)
+            sm.set_array([])
+            ticks = np.arange(self.vmin, self.vmax + 1, 5)
+            cbar = plt.colorbar(sm, ax=ax, ticks=ticks)
+            cbar.set_ticklabels([str(t) for t in ticks])
+            cbar.set_label('Ambient Temp [C]', fontsize=12)
+
+            slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+            y_fit = slope * x + intercept
+
+            ax.plot(x, y_fit, c='red', label='Best fit')
+            ax.text(0.55, 0.03, f'y = {slope:.2f}x + {intercept:.2f}',transform=ax.transAxes, fontsize=13, verticalalignment='bottom')
 
         # Add 1:1 line
         ax.plot([0, 100], [0, 100], c='black', linestyle='--', label='1:1')
 
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
-        y_fit = slope * x + intercept
-
-        ax.plot(x, y_fit, c = 'red', label = 'Best fit')
-
         # Metrics
         r2, rmse, mbe, nmb, nme = self._calculate_metrics(data['reference'], data[model])
-        ax.text(0.1, 0.95, f'R\u00b2 = {r2:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
-        ax.text(0.1, 0.87, f'RMSE = {rmse:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
-        ax.text(0.1, 0.80, f'MBE = {mbe:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
-        ax.text(0.1, 0.73, f'NMB = {nmb:.2%}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
-        ax.text(0.1, 0.66, f'NME = {nme:.2%}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
-        ax.text(0.1, 0.59, f'Data Points = {len(data)}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
-        ax.text(0.55, 0.03, f'y = {slope:.2f}x + {intercept:.2f}',transform=ax.transAxes, fontsize=13, verticalalignment='bottom')
-
-        # Colorbar
-        sm = ScalarMappable(cmap='RdBu_r', norm=self.temp_norm)
-        sm.set_array([])
-        ticks = np.arange(self.vmin, self.vmax + 1, 5)
-        cbar = plt.colorbar(sm, ax=ax, ticks=ticks)
-        cbar.set_ticklabels([str(t) for t in ticks])
-        cbar.set_label('Ambient Temp [C]', fontsize=12)
+        ax.text(0.05, 0.95, f'R\u00b2 = {r2:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
+        ax.text(0.05, 0.87, f'RMSE = {rmse:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
+        ax.text(0.05, 0.80, f'MBE = {mbe:.2f}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
+        ax.text(0.05, 0.73, f'NMB = {nmb:.2%}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
+        ax.text(0.05, 0.66, f'NME = {nme:.2%}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
+        ax.text(0.05, 0.59, f'Data Points = {len(data)}', transform=ax.transAxes, fontsize=13, verticalalignment='top')
 
         # Titles & labels
-        ax.set_title(f'{name}', fontsize=14)
+        # ax.set_title(f'{name}', fontsize=14)
         ax.set_xlabel('Reference O3 (ppb)', fontsize=14)
         ax.set_ylabel(f'Calibrated O3 (ppb)', fontsize=14)
+        ax.set_aspect('equal', adjustable='box')
 
         ax.set_xlim(0, 90)
         ax.set_ylim(0, 90)
@@ -83,13 +109,81 @@ class PlotOzone:
         r2 = r2_score(observed, predicted)
         rmse = root_mean_squared_error(observed, predicted)
         mbe = (predicted - observed).mean()
-        
+    
         # Calculate percentage errors, handling division by zero
         nmb = np.nanmean(np.divide(predicted - observed, observed, out=np.zeros_like(predicted - observed), where=observed!=0))
         nme = np.nanmean(np.divide(abs(predicted - observed), observed, out=np.zeros_like(abs(predicted - observed)), where=observed!=0))
         
         return r2, rmse, mbe, nmb, nme
-
+    
+    def plot_two_models(self, data, sensor_id, calibration1, calibration2, model1_col, model2_col):
+        """
+        Plot two calibration models against reference values with different colors.
+        
+        Parameters:
+        - data: DataFrame containing the data
+        - sensor_id: sensor identifier
+        - calibration1: label for first calibration method
+        - calibration2: label for second calibration method
+        - model1_col: column name for first calibrated values (e.g., 'o3_calibrated_model1')
+        - model2_col: column name for second calibrated values (e.g., 'o3_calibrated_model2')
+        """
+        fig, ax = plt.subplots(figsize=(7, 6))
+        imagefolder = my_setup.local_image_folder("Ozone", "")
+        
+        # Define colors for each model
+        color1 = 'blue'
+        color2 = 'red'
+        
+        # Plot first model
+        if model1_col in data.columns:
+            x1 = data['reference']
+            y1 = data[model1_col]
+            ax.scatter(x1, y1, c=color1, alpha=0.6, s=5, label=calibration1)
+            
+            # Calculate metrics for model 1
+            r2_1, rmse_1, mbe_1, nmb_1, nme_1 = self._calculate_metrics(data['reference'], data[model1_col])
+        
+        # Plot second model
+        if model2_col in data.columns:
+            x2 = data['reference']
+            y2 = data[model2_col]
+            ax.scatter(x2, y2, c=color2, alpha=0.6, s=5, label=calibration2)
+            
+            # Calculate metrics for model 2
+            r2_2, rmse_2, mbe_2, nmb_2, nme_2 = self._calculate_metrics(data['reference'], data[model2_col])
+        
+        # Add 1:1 line
+        ax.plot([0, 100], [0, 100], c='black', linestyle='--', label='')
+        
+        # Display metrics for both models
+        r21 = r2_score(data[model1_col], data['reference'])
+        r22 = r2_score(data[model2_col], data['reference'])
+        rmse1 = root_mean_squared_error(data[model1_col], data['reference'])
+        rmse2 = root_mean_squared_error(data[model2_col], data['reference'])
+        mbe1 = (data['reference'] - data[model1_col]).mean()
+        mbe2 = (data['reference'] - data[model2_col]).mean()
+        ax.text(0.03, 0.95, f'R\u00b2 = {r21:.2f},', transform=ax.transAxes, fontsize=10, color=color1, verticalalignment='top')
+        ax.text(0.03, 0.9, f'R\u00b2 = {r22:.2f},', transform=ax.transAxes, fontsize=10, color=color2, verticalalignment='top')
+        ax.text(0.2, 0.95, f'RMSE = {rmse1:.2f},', transform=ax.transAxes, fontsize=10, color=color1, verticalalignment='top')
+        ax.text(0.2, 0.9, f'RMSE = {rmse2:.2f},', transform=ax.transAxes, fontsize=10, color=color2, verticalalignment='top')
+        ax.text(0.415, 0.95, f'MBE = {mbe1:.2f}', transform=ax.transAxes, fontsize=10, color=color1, verticalalignment='top')
+        ax.text(0.415, 0.9, f'MBE = {mbe2:.2f}', transform=ax.transAxes, fontsize=10, color=color2, verticalalignment='top')
+        
+        ax.text(0.15, 0.025, f'Data Points = {len(data)}', transform=ax.transAxes, fontsize=13, verticalalignment='bottom')
+        
+        # Titles & labels
+        # ax.set_title(f'{sensor_id} - With and Without Post-Field Calibration', fontsize=14)
+        ax.set_xlabel('Reference O3 (ppb)', fontsize=14)
+        ax.set_ylabel(f'Calibrated O3 (ppb)', fontsize=14)
+        ax.legend(loc='lower right', fontsize=10)
+        
+        ax.set_xlim(0, 90)
+        ax.set_ylim(0, 90)
+        ax.set_aspect('equal', adjustable='box')
+        
+        plt.savefig(rf"{imagefolder}{sensor_id}/WithandWithoutPostField.jpg", 
+                    format='jpg', dpi=300)
 class PlotPlantower:
 
     def __init__(self):

@@ -22,8 +22,8 @@ class CreateTrainingandTestData:
 
     def get_combined_data(self,training_date,testing_date,reference_1,reference_2):
         training = self._get_training_data(training_date,reference_1,reference_2)
-        testing = self._get_testing_data(testing_date, reference_1, reference_2)
-        all_data = self._with_reference(training,testing)
+        testing = self._get_testing_data(training_date, testing_date, reference_1, reference_2)
+        all_data = self._with_reference(training_date, training,testing)
         all_data = clean_data.eliminate_outliers(all_data,self.variable)
         training = clean_data.eliminate_outliers(training,self.variable)
         return training, all_data
@@ -38,13 +38,14 @@ class CreateTrainingandTestData:
 
         all_training_data = pd.concat([precal_all_training_data, postcal_all_training_data])
 
-        if(self.variable == 'o3'):
-            all_training_data['week'] = all_training_data.index.isocalendar().week
-            all_training_data['seasonal_bias'] = all_training_data['week'].apply(lambda x: 1 if 23 <= x <= 40 else 0)
+        if self.variable == 'o3':
+            # Calculate weeks elapsed since training_date[0]
+            all_training_data['week'] = ((all_training_data.index - training_date[0]).days // 7)
+            # all_training_data['seasonal_bias'] = all_training_data['week'].apply(lambda x: 1 if 23 <= x <= 40 else 0)
 
         return all_training_data
 
-    def _get_testing_data(self,testing_date,reference_1, reference_2):
+    def _get_testing_data(self,training_date,testing_date,reference_1, reference_2):
         voz_test1 = self.voz_data[(self.voz_data.index >= testing_date[0]) & (self.voz_data.index <= testing_date[1])] #Trial 1 Period
         voz_test2 = self.voz_data[(self.voz_data.index >= testing_date[2]) & (self.voz_data.index <= testing_date[3])] #Trial 2 Period
         voz_testing_data = pd.concat([voz_test1, voz_test2])
@@ -53,13 +54,15 @@ class CreateTrainingandTestData:
         testing_data_2 = voz_testing_data.join(reference_2, how='inner')
         all_testing_data = pd.concat([testing_data_1, testing_data_2])
 
-        if(self.variable == 'o3'):
-            all_testing_data['week'] = all_testing_data.index.isocalendar().week
-            all_testing_data['seasonal_bias'] = all_testing_data['week'].apply(lambda x: 1 if 23 <= x <= 40 else 0)
+        if self.variable == 'o3':
+            # Calculate weeks elapsed since training_date[0]
+            all_testing_data['week'] = ((all_testing_data.index - training_date[0]).days // 7)
+            # all_training_data['seasonal_bias'] = all_training_data['week'].apply(lambda x: 1 if 23 <= x <= 40 else 0)
+            # all_testing_data.to_csv('./test.csv')
 
         return all_testing_data
 
-    def _with_reference(self,all_testing_data,all_training_data):
+    def _with_reference(self,training_date, all_testing_data,all_training_data):
         combined = pd.concat([all_testing_data, all_training_data])
         
         # Align reference data columns with combined (fill missing column with NaN)
@@ -69,14 +72,14 @@ class CreateTrainingandTestData:
         new_rows = voz_data.loc[~voz_data.index.isin(combined.index)]
         
         # Concatenate everything and sort by datetime index
-        all_training_data = pd.concat([combined, new_rows]).sort_index()
+        all_data = pd.concat([combined, new_rows]).sort_index()
 
-        if(self.variable == 'o3'):
-            all_training_data['week'] = all_training_data.index.isocalendar().week
-            all_training_data['seasonal_bias'] = all_training_data['week'].apply(lambda x: 1 if 23 <= x <= 40 else 0)
+        if self.variable == 'o3':
+            # Calculate weeks elapsed since training_date[0]
+            all_data['week'] = ((all_data.index - training_date[0]).days // 7)
+            # all_training_data['seasonal_bias'] = all_training_data['week'].apply(lambda x: 1 if 23 <= x <= 40 else 0)
             
-        
-        return all_training_data
+        return all_data
     
     # Cuts data into subsections as specified by dates. 
     # Dates should be ordered as following: [start_date_1, end_date_1, start_date_2, end_date_2,...] so on

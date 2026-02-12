@@ -72,13 +72,13 @@ def calibrated_files_2023():
 
 def calibrated_files_2025():
     files = [
-        "CutlerOrosi_calibrated.csv",
-        "Avenal_calibrated.csv",
-        "Coalinguita_calibrated.csv",
-        "TerraBella_calibrated.csv",
-        "LostHills_calibrated.csv",
-        "McFarland_calibrated.csv",
-        "Coalinga_calibrated.csv"
+        "CutlerOrosi_calibratedBoth.csv",
+        "Avenal_calibratedBoth.csv",
+        "Coalinguita_calibratedBoth.csv",
+        "TerraBella_calibratedBoth.csv",
+        "LostHills_calibratedBoth.csv",
+        "McFarland_calibratedBoth.csv",
+        "Coalinga_calibratedBoth.csv"
     ]
     return files
 
